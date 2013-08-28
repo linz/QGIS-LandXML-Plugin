@@ -1,8 +1,8 @@
-= QGIS LandXML Plugin =
+# QGIS LandXML Plugin
 
 Land Information New Zealand LandXML importer for QGIS. Import parcels and marks from a LINZ Landonline LandXml file
 
-== License ==
+## License
 
 This program is released under the terms of the new BSD license. See the 
 LICENSE file for more information.
