@@ -2,7 +2,7 @@
 name=LandXml import plugin
 description=Import parcels and nodes from a LINZ LandXml file
 category=Vector
-version=1.0
+version=0.1
 experimental=True
 qgisMinimumVersion=1.8
 repository=https://github.com/linz/QGIS-LandXML-Plugin
