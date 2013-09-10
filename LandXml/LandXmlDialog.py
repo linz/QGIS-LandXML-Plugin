@@ -89,7 +89,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             'crd_order:string')])
         epsg = landxml.coordSysEpsgId()
         if epsg:
-            uri += '&epsg:'+epsg
+            uri += '&epsg:'+str(epsg)
         vl = QgsVectorLayer(uri,name,"memory")
         # Need to do something about crs()
         vl.startEditing()
@@ -109,20 +109,6 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             fet['condition']=mark.condition()
             fet['crd_order']=mark.point().order()
             pr.addFeatures([fet])
-            fet.setAttributeMap( { 
-                0 : QVariant(mark.lolid()),
-                1 : QVariant(mark.name()),
-                2 : QVariant(mark.description()),
-                3 : QVariant(mark.type()),
-                4 : QVariant(mark.beacon()),
-                5 : QVariant(mark.protection()),
-                6 : QVariant(mark.state()),
-                7 : QVariant(mark.condition()),
-                8 : QVariant(mark.point().order())
-                } )
-            pr.addFeatures( [ fet ] )
-
-        vl.updateFieldMap()
         vl.updateExtents()
         vl.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vl)
@@ -140,19 +126,10 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             )])
         epsg = landxml.coordSysEpsgId()
         if epsg:
-            uri += '&epsg:'+epsg
+            uri += '&epsg:'+str(epsg)
         vl = QgsVectorLayer(uri,name,"memory")
         fields=vl.pendingFields()
         pr=vl.dataProvider()
-        pr.addAttributes( [
-            QgsField("lolid", QVariant.Int, "Int"),
-            QgsField("name",QVariant.String,"String"),
-            QgsField("description",QVariant.String,"String"),
-            QgsField("type",QVariant.String,"String"),
-            QgsField("class", QVariant.String, "String"),
-            QgsField("state",QVariant.String,"String"),
-            QgsField("area", QVariant.Double, "Double"),
-            ] )
         for parcel in landxml.parcels():
             fet = QgsFeature(fields)
             fet.setGeometry(QgsGeometry.fromWkt(MultiPolygon(parcel.coords()).to_wkt()))
@@ -164,19 +141,6 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             fet['state']=parcel.state() 
             fet['area']=parcel.area() 
             pr.addFeatures([fet])
-            fet = QgsFeature()
-            fet.setGeometry(QgsGeometry.fromWkt(QString(MultiPolygon(parcel.coords()).to_wkt())))
-            fet.setAttributeMap( { 
-                0 : QVariant(parcel.lolid()), 
-                1 : QVariant(parcel.name()), 
-                2 : QVariant(parcel.description()), 
-                3 : QVariant(parcel.type()), 
-                4 : QVariant(parcel.pclass()), 
-                5 : QVariant(parcel.state()), 
-                6 : QVariant(parcel.area()), 
-                } )
-            pr.addFeatures( [ fet ] )
-        vl.updateFieldMap()
         vl.updateExtents()
         vl.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vl)
