@@ -74,17 +74,9 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             # raise
             message = str(sys.exc_info()[1])
             QMessageBox.information(self,"LandXml error","Problem importing xml\n"+message)
-
-    def _createLayerURI(self, type, landxml):
-        uri = type
-        crs = landxml.coordSysEpsgId()
-        if crs:
-            uri += '?crs=epsg:'+str(crs)
-        return uri
     
     def _createMarkLayer(self,landxml):
         name = "LandXml_marks"
-<<<<<<< HEAD
         uri="Point?"+"&".join(['field='+x for x in (
             'mrk_id:int',
             'name:string',
@@ -95,10 +87,10 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             'state:string',
             'condition:string',
             'crd_order:string')])
+        epsg = landxml.coordSysEpsgId()
+        if epsg:
+            uri += '&epsg:'+epsg
         vl = QgsVectorLayer(uri,name,"memory")
-=======
-        vl = QgsVectorLayer(self._createLayerURI('Point',landxml),name,"memory")
->>>>>>> 195895cbc854fffbb6b7bb2edd6cacea01dc2d53
         # Need to do something about crs()
         vl.startEditing()
         fields=vl.pendingFields()
@@ -107,7 +99,6 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             (x,y) = mark.point().coords()
             fet = QgsFeature(fields)
             fet.setGeometry(QgsGeometry.fromPoint(QgsPoint(x,y)))
-<<<<<<< HEAD
             fet['mrk_id']=mark.lolid()
             fet['name']=mark.name()
             fet['description']=mark.description()
@@ -118,7 +109,6 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             fet['condition']=mark.condition()
             fet['crd_order']=mark.point().order()
             pr.addFeatures([fet])
-=======
             fet.setAttributeMap( { 
                 0 : QVariant(mark.lolid()),
                 1 : QVariant(mark.name()),
@@ -133,14 +123,12 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             pr.addFeatures( [ fet ] )
 
         vl.updateFieldMap()
->>>>>>> bb40e0853aabd2a35620bcca32bf09e0e8a480ee
         vl.updateExtents()
         vl.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vl)
 
     def _createParcelLayer(self, landxml):
         name = "LandXml_parcels"
-<<<<<<< HEAD
         uri="MultiPolygon?"+"&".join(['field='+x for x in (
             'lolid:int',
             'name:string',
@@ -150,12 +138,12 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             'state:string',
             'area:double'
             )])
+        epsg = landxml.coordSysEpsgId()
+        if epsg:
+            uri += '&epsg:'+epsg
         vl = QgsVectorLayer(uri,name,"memory")
         fields=vl.pendingFields()
         pr=vl.dataProvider()
-=======
-        vl = QgsVectorLayer(self._createLayerURI('MultiPolygon',landxml),name,"memory")
-        pr = vl.dataProvider()
         pr.addAttributes( [
             QgsField("lolid", QVariant.Int, "Int"),
             QgsField("name",QVariant.String,"String"),
@@ -165,9 +153,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             QgsField("state",QVariant.String,"String"),
             QgsField("area", QVariant.Double, "Double"),
             ] )
->>>>>>> 195895cbc854fffbb6b7bb2edd6cacea01dc2d53
         for parcel in landxml.parcels():
-<<<<<<< HEAD
             fet = QgsFeature(fields)
             fet.setGeometry(QgsGeometry.fromWkt(MultiPolygon(parcel.coords()).to_wkt()))
             fet['lolid']=parcel.lolid()
@@ -178,7 +164,6 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             fet['state']=parcel.state() 
             fet['area']=parcel.area() 
             pr.addFeatures([fet])
-=======
             fet = QgsFeature()
             fet.setGeometry(QgsGeometry.fromWkt(QString(MultiPolygon(parcel.coords()).to_wkt())))
             fet.setAttributeMap( { 
@@ -192,7 +177,6 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
                 } )
             pr.addFeatures( [ fet ] )
         vl.updateFieldMap()
->>>>>>> bb40e0853aabd2a35620bcca32bf09e0e8a480ee
         vl.updateExtents()
         vl.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vl)
