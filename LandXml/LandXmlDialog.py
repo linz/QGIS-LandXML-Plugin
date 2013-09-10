@@ -75,9 +75,16 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             message = str(sys.exc_info()[1])
             QMessageBox.information(self,"LandXml error","Problem importing xml\n"+message)
 
-
+    def _createLayerURI(self, type, landxml):
+        uri = type
+        crs = landxml.coordSysEpsgId()
+        if crs:
+            uri += '?crs=epsg:'+str(crs)
+        return uri
+    
     def _createMarkLayer(self,landxml):
         name = "LandXml_marks"
+<<<<<<< HEAD
         uri="Point?"+"&".join(['field='+x for x in (
             'mrk_id:int',
             'name:string',
@@ -89,6 +96,9 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             'condition:string',
             'crd_order:string')])
         vl = QgsVectorLayer(uri,name,"memory")
+=======
+        vl = QgsVectorLayer(self._createLayerURI('Point',landxml),name,"memory")
+>>>>>>> 195895cbc854fffbb6b7bb2edd6cacea01dc2d53
         # Need to do something about crs()
         vl.startEditing()
         fields=vl.pendingFields()
@@ -130,6 +140,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
 
     def _createParcelLayer(self, landxml):
         name = "LandXml_parcels"
+<<<<<<< HEAD
         uri="MultiPolygon?"+"&".join(['field='+x for x in (
             'lolid:int',
             'name:string',
@@ -142,6 +153,19 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
         vl = QgsVectorLayer(uri,name,"memory")
         fields=vl.pendingFields()
         pr=vl.dataProvider()
+=======
+        vl = QgsVectorLayer(self._createLayerURI('MultiPolygon',landxml),name,"memory")
+        pr = vl.dataProvider()
+        pr.addAttributes( [
+            QgsField("lolid", QVariant.Int, "Int"),
+            QgsField("name",QVariant.String,"String"),
+            QgsField("description",QVariant.String,"String"),
+            QgsField("type",QVariant.String,"String"),
+            QgsField("class", QVariant.String, "String"),
+            QgsField("state",QVariant.String,"String"),
+            QgsField("area", QVariant.Double, "Double"),
+            ] )
+>>>>>>> 195895cbc854fffbb6b7bb2edd6cacea01dc2d53
         for parcel in landxml.parcels():
 <<<<<<< HEAD
             fet = QgsFeature(fields)
