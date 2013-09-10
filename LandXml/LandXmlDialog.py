@@ -75,10 +75,16 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             message = str(sys.exc_info()[1])
             QMessageBox.information(self,"LandXml error","Problem importing xml\n"+message)
 
-
+    def _createLayerURI(self, type, landxml):
+        uri = type
+        crs = landxml.coordSysEpsgId()
+        if crs:
+            uri += '?crs=epsg:'+str(crs)
+        return uri
+    
     def _createMarkLayer(self,landxml):
         name = "LandXml_marks"
-        vl = QgsVectorLayer("Point",name,"memory")
+        vl = QgsVectorLayer(self._createLayerURI('Point',landxml),name,"memory")
         # Need to do something about crs()
         pr = vl.dataProvider()
         pr.addAttributes( [
@@ -117,7 +123,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
 
     def _createParcelLayer(self, landxml):
         name = "LandXml_parcels"
-        vl = QgsVectorLayer("MultiPolygon",name,"memory")
+        vl = QgsVectorLayer(self._createLayerURI('MultiPolygon',landxml),name,"memory")
         pr = vl.dataProvider()
         pr.addAttributes( [
             QgsField("lolid", QVariant.Int, "Int"),

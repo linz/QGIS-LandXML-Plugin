@@ -12,6 +12,61 @@
 import re
 import xml.etree.ElementTree as et
 
+linz_epsg_mapping = {
+    'COLLTM2000':2114,
+    'COLLTM1949':27214,
+    'GAWLTM2000':2125,
+    'GAWLTM1949':27225,
+    'GREYTM2000':2118,
+    'GREYTM1949':27218,
+    'HAWKTM2000':2108,
+    'HAWKTM1949':27208,
+    'HOKITM2000':2121,
+    'HOKITM1949':27221,
+    'JACKTM2000':2123,
+    'JACKTM1949':27223,
+    'KARATM2000':2116,
+    'KARATM1949':27216,
+    'LINDTM2000':2127,
+    'LINDTM1949':27227,
+    'MARLTM2000':2120,
+    'MARLTM1949':27220,
+    'EDENTM2000':2105,
+    'EDENTM1949':27205,
+    'PLEATM2000':2124,
+    'PLEATM1949':27224,
+    'YORKTM2000':2129,
+    'YORKTM1949':27229,
+    'NICHTM2000':2128,
+    'NICHTM1949':27228,
+    'NELSTM2000':2115,
+    'NELSTM1949':27215,
+    'TAIETM2000':2131,
+    'TAIETM1949':27231,
+    'OBSETM2000':2130,
+    'OBSETM1949':27230,
+    'OKARTM2000':2122,
+    'OKARTM1949':27222,
+    'POVETM2000':2107,
+    'POVETM1949':27207,
+    'TARATM2000':2109,
+    'TARATM1949':27209,
+    'TIMATM2000':2126,
+    'TIMATM1949':27226,
+    'TUHITM2000':2110,
+    'TUHITM1949':27210,
+    'WAIRTM2000':2112,
+    'WAIRTM1949':27212,
+    'WANGTM2000':2111,
+    'WANGTM1949':27211,
+    'WELLTM2000':2113,
+    'WELLTM1949':27213,
+    'NZGD1949':4272,
+    'NZGD2000':4167,
+    'NZMG':27200,
+    'NZTM':2193
+}
+
 class LandXmlException( Exception ):
 
     def __init_(self,value):
@@ -143,17 +198,33 @@ class LandXml (object):
         self._data = data
         self._root = root
         self._ns = ns
+        self._coordsys = {}
         self._parcels=[]
         self._points=[]
         self._pointIdx={}
         self._surveys=[]
         self._parse()
-
+        
+    def _readHeader(self):
+        ns = self._ns;
+        cs = self._data.find(ns+'CoordinateSystem')
+        if cs is not None:
+            self._coordsys['name'] = cs.get('name')
+            self._coordsys['description'] = cs.get('desc')
+    
     def _parse(self):
+        self._readHeader()
         self._readPoints()
         # self._readMarks()
         # self._readParcels()
         self._readSurveys()
+        
+    def coordSys(self):
+        return self._coordsys['name']
+    
+    def coordSysEpsgId(self):
+        if self._coordsys['name'] in linz_epsg_mapping:
+            return linz_epsg_mapping[self._coordsys['name']]
 
     def monuments(self):
         for m in self._readMarks():
@@ -340,4 +411,3 @@ class LandXml (object):
             dx0 = dx1
             dy0 = dy1
         return area
-
