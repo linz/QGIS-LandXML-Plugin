@@ -97,6 +97,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             (x,y) = mark.point().coords()
             fet = QgsFeature(fields)
             fet.setGeometry(QgsGeometry.fromPoint(QgsPoint(x,y)))
+<<<<<<< HEAD
             fet['mrk_id']=mark.lolid()
             fet['name']=mark.name()
             fet['description']=mark.description()
@@ -107,6 +108,22 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             fet['condition']=mark.condition()
             fet['crd_order']=mark.point().order()
             pr.addFeatures([fet])
+=======
+            fet.setAttributeMap( { 
+                0 : QVariant(mark.lolid()),
+                1 : QVariant(mark.name()),
+                2 : QVariant(mark.description()),
+                3 : QVariant(mark.type()),
+                4 : QVariant(mark.beacon()),
+                5 : QVariant(mark.protection()),
+                6 : QVariant(mark.state()),
+                7 : QVariant(mark.condition()),
+                8 : QVariant(mark.point().order())
+                } )
+            pr.addFeatures( [ fet ] )
+
+        vl.updateFieldMap()
+>>>>>>> bb40e0853aabd2a35620bcca32bf09e0e8a480ee
         vl.updateExtents()
         vl.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vl)
@@ -126,6 +143,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
         fields=vl.pendingFields()
         pr=vl.dataProvider()
         for parcel in landxml.parcels():
+<<<<<<< HEAD
             fet = QgsFeature(fields)
             fet.setGeometry(QgsGeometry.fromWkt(MultiPolygon(parcel.coords()).to_wkt()))
             fet['lolid']=parcel.lolid()
@@ -136,6 +154,21 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             fet['state']=parcel.state() 
             fet['area']=parcel.area() 
             pr.addFeatures([fet])
+=======
+            fet = QgsFeature()
+            fet.setGeometry(QgsGeometry.fromWkt(QString(MultiPolygon(parcel.coords()).to_wkt())))
+            fet.setAttributeMap( { 
+                0 : QVariant(parcel.lolid()), 
+                1 : QVariant(parcel.name()), 
+                2 : QVariant(parcel.description()), 
+                3 : QVariant(parcel.type()), 
+                4 : QVariant(parcel.pclass()), 
+                5 : QVariant(parcel.state()), 
+                6 : QVariant(parcel.area()), 
+                } )
+            pr.addFeatures( [ fet ] )
+        vl.updateFieldMap()
+>>>>>>> bb40e0853aabd2a35620bcca32bf09e0e8a480ee
         vl.updateExtents()
         vl.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vl)
