@@ -110,6 +110,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
                 } )
             pr.addFeatures( [ fet ] )
 
+        vl.updateFieldMap()
         vl.updateExtents()
         vl.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vl)
@@ -140,6 +141,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
                 6 : QVariant(parcel.area()), 
                 } )
             pr.addFeatures( [ fet ] )
+        vl.updateFieldMap()
         vl.updateExtents()
         vl.commitChanges()
         QgsMapLayerRegistry.instance().addMapLayer(vl)
