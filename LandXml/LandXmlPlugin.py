@@ -23,7 +23,7 @@ class LandXmlPlugin:
         self._iface = iface
 
     def initGui(self):
-        self._action = QAction(QIcon(":/plugins/LandXml/LandXmlIcon.png"), \
+        self._action = QAction(QIcon(":/plugins/LandXml/LandXmlIcon.png"), 
         "LandXml", self._iface.mainWindow())
         self._action.setWhatsThis("Import a LandXml file")
         QObject.connect(self._action, SIGNAL("activated()"), self.run)
@@ -36,7 +36,7 @@ class LandXmlPlugin:
 
     def run(self):
         settings = QSettings()
-        prjSetting = settings.value("/Projections/defaultBehaviour") # .toString()
+        prjSetting = settings.value("/Projections/defaultBehaviour")
         try:
            settings.setValue("/Projections/defaultBehaviour","")
            dlg = LandXmlDialog(self._iface)

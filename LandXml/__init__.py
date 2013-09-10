@@ -22,10 +22,10 @@ def description():
     return "Import parcels and nodes from a LINZ LandXml file"
 
 def version():
-    return "0.1"
+    return "0.2"
 
 def qgisMinimumVersion():
-    return "1.3"
+    return "2.0"
 
 def authorName():
     return "Chris Crook"
