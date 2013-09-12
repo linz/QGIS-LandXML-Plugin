@@ -89,7 +89,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             'crd_order:string')])
         epsg = landxml.coordSysEpsgId()
         if epsg:
-            uri += '&epsg:'+str(epsg)
+            uri += '&crs=epsg:'+str(epsg)
         vl = QgsVectorLayer(uri,name,"memory")
         # Need to do something about crs()
         vl.startEditing()
@@ -126,7 +126,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             )])
         epsg = landxml.coordSysEpsgId()
         if epsg:
-            uri += '&epsg:'+str(epsg)
+            uri += '&crs=epsg:'+str(epsg)
         vl = QgsVectorLayer(uri,name,"memory")
         fields=vl.pendingFields()
         pr=vl.dataProvider()
