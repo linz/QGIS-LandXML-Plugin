@@ -195,6 +195,7 @@ class LandXml (object):
         data.parse(file)
         root = data.find(".")
         ns = root.tag.split("}")[0]+"}"
+        self._file = str(file)
         self._data = data
         self._root = root
         self._ns = ns
@@ -248,7 +249,7 @@ class LandXml (object):
             coords = self._getCoords(p.text)
             point = Point(coords,id=id,order=order,type=pntType)
             self._points.append(point)
-            self._pointIdx[oID] = point
+            self._pointIdx[id] = point
 
     def _readMarks(self):
         ns = self._ns;
@@ -263,7 +264,7 @@ class LandXml (object):
             beacon = m.get('beacon','')
             protection = m.get('beaconProtection','')
             pntref = m.get('pntRef')
-            point = self._pointIdx[pntref]
+            point = self._getPoint[pntref]
             monument=Monument(point,name=name,lolid=lolid,description=desc,type=type,state=state,condition=condition,beacon=beacon,protection=protection)
             yield monument
 
@@ -358,6 +359,13 @@ class LandXml (object):
     def _readLine(self,c):
         return [self._readPointType(c,'Start'),self._readPointType(c,'End')]
 
+
+    def _getPoint( self, id ):
+        try:
+            return self._pointIdx[id]
+        except:
+            raise RuntimeError("CgPoint with name "+str(id)+" is not defined in "+self._file)
+
     def _readPointType(self,c,tag):
         ns = self._ns
         pntref = c.find(ns+tag)
@@ -369,7 +377,7 @@ class LandXml (object):
             crds = self._getCoords(pntref.text)
         else:
             ref = pntref.get("pntRef")
-            crds = self._pointIdx[ref].coords()
+            crds = self._getPoint[ref].coords()
         return crds
 
     def _readIrregularLine(self,c):
