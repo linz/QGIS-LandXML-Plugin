@@ -264,7 +264,7 @@ class LandXml (object):
             beacon = m.get('beacon','')
             protection = m.get('beaconProtection','')
             pntref = m.get('pntRef')
-            point = self._getPoint[pntref]
+            point = self._getPoint(pntref)
             monument=Monument(point,name=name,lolid=lolid,description=desc,type=type,state=state,condition=condition,beacon=beacon,protection=protection)
             yield monument
 
@@ -377,7 +377,7 @@ class LandXml (object):
             crds = self._getCoords(pntref.text)
         else:
             ref = pntref.get("pntRef")
-            crds = self._getPoint[ref].coords()
+            crds = self._getPoint(ref).coords()
         return crds
 
     def _readIrregularLine(self,c):
