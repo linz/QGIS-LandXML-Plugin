@@ -22,7 +22,7 @@ def description():
     return "Import parcels and nodes from a LINZ LandXml file"
 
 def version():
-    return "1.0"
+    return "1.1"
 
 def qgisMinimumVersion():
     return "2.0"
