@@ -148,6 +148,7 @@ class Parcel:
 
     def __init__(self,
             coords,
+            geomtype,
             name,
             lolid='',
             description='',
@@ -156,6 +157,7 @@ class Parcel:
             pclass='',
             type=''):
         self._coords=coords
+        self._geomtype=geomtype
         self._name=name
         self._lolid=lolid
         self._description = description
@@ -166,6 +168,9 @@ class Parcel:
 
     def coords(self):
         return self._coords
+
+    def geomtype( self):
+        return self._geomtype
 
     def name(self):
         return self._name
@@ -195,7 +200,7 @@ class LandXml (object):
         data.parse(file)
         root = data.find(".")
         ns = root.tag.split("}")[0]+"}"
-        self._file = str(file)
+        self._file = unicode(file)
         self._data = data
         self._root = root
         self._ns = ns
@@ -286,9 +291,12 @@ class LandXml (object):
             state = p.get('state','')
             pclass = p.get('class','')
             type = p.get('parcelType','')
-            coords = self._readCoGo(cogo)
-            parcel = Parcel(coords,name,lolid=lolid,description=desc,area=area,
-                state=state,pclass=pclass,type=type)
+            try:
+                coords, geomtype = self._readCoGo(cogo)
+                parcel = Parcel(coords,geomtype,name,lolid=lolid,description=desc,area=area,
+                    state=state,pclass=pclass,type=type)
+            except LandXmlException as excp:
+                raise LandXmlException("Parcel "+name+": "+unicode(excp))
             yield parcel
             #self._parcels.append(parcel)
 
@@ -338,19 +346,34 @@ class LandXml (object):
                     coords.extend(line[1:])
 
         polylist = []
+        linelist = []
         inner = None
         mult = 1.0
         for c in crdlist:
+            # Test if this is a valid ring...
+            if len(c) < 3 or c[0] != c[-1]:
+                linelist.append(c)
+                inner=None
+                continue
             area = self._calcArea(c)
-            if inner == None:
-                mult = area
+            # Use first polygon to define whether positive or
+            # negative area corresponds to output polygon.
+            if inner == None and area < 0.0:
+                mult = -1.0
             area *= mult
             if area >= 0.0:
                 inner = []
                 polylist.append([c,inner])
             else:
                 inner.append(c)
-        return polylist
+
+        if len(linelist) > 0 and len(polylist) > 0:
+            raise LandXmlException("Cannot handle parcel with both polygon and linear geometries")
+
+        if len(linelist) > 0:
+            return linelist,"MultiLineString"
+
+        return polylist,"MultiPolygon"
 
     def _getCoords(self,text):
         crds = text.split()
@@ -363,7 +386,7 @@ class LandXml (object):
         try:
             return self._pointIdx[id]
         except:
-            raise RuntimeError("CgPoint with name "+str(id)+" is not defined in "+self._file)
+            raise LandXmlException("CgPoint with name "+unicode(id)+" is not defined in "+self._file)
 
     def _readPointType(self,c,tag):
         ns = self._ns
