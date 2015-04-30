@@ -462,11 +462,11 @@ class LandXml (object):
 
     def _readObservations(self):
         ns = self._ns;
-        obs=self._data.findall("%sSurvey/%sReducedObservation"%(ns,ns))
+        obs=self._data.findall("%sSurvey//%sReducedObservation"%(ns,ns))
         for o in obs:
             yield self._readObservation(o)
 
-        arcobs=self._data.findall("%sSurvey/%sReducedArcObservation"%(ns,ns))
+        arcobs=self._data.findall("%sSurvey//%sReducedArcObservation"%(ns,ns))
         for o in arcobs:
             yield self._readObservation(o)
 
@@ -511,10 +511,10 @@ class LandXml (object):
 
             azdegrees=None;
             if azimuth:
-                match=re.match(azimuth,r'(\d+)\.(\d\d)(\d\d)$')
-                if match:
-                    azdegrees=float(match.group(1))+float(match.group(2))/60.0+float(match.group(3))/3600.0;
-                    azimuth=match.group(1)+u"\xB0"+match.group('2')+"'"+match.group(3)+'"'
+                m=re.match(r'(\d+)\.(\d\d)(\d\d)$',azimuth)
+                if m:
+                    azdegrees=float(m.group(1))+float(m.group(2))/60.0+float(m.group(3))/3600.0;
+                    azimuth=m.group(1)+u"\xB0"+m.group(2)+"'"+m.group(3)+'"'
             if distance is not None:
                 distance=float(distance)
 
