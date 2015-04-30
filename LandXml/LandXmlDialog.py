@@ -86,7 +86,8 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             'protection:string',
             'state:string',
             'condition:string',
-            'crd_order:string')])
+            'crd_order:string',
+            'purpose:string')])
         epsg = landxml.coordSysEpsgId()
         if epsg:
             uri += '&crs=epsg:'+unicode(epsg)
@@ -108,6 +109,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             fet['state']=mark.state()
             fet['condition']=mark.condition()
             fet['crd_order']=mark.point().order()
+            fet['purpose']=mark.purpose()
             pr.addFeatures([fet])
         vl.updateExtents()
         vl.commitChanges()
@@ -163,4 +165,54 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
                 vl.updateExtents()
                 vl.commitChanges()
                 QgsMapLayerRegistry.instance().addMapLayer(vl)
-
+    
+    def _createObsLayer(self,landxml):
+        name = "LandXml_observations"
+        uri="LineString?"+"&".join(['field='+x for x in (
+            'from:string',
+            'to:string',
+            'distance:double',
+            'disttype:string',
+            'distclass:string',
+            'distsurvey:string',
+            'azimuth:string',
+            'azdegrees:double',
+            'arcradius:double',
+            'arctype:string',
+            'aztype:string',
+            'azclass:string',
+            'azsurvey:string',
+            'equipment:string',
+            'date:string',
+            )])
+        epsg = landxml.coordSysEpsgId()
+        if epsg:
+            uri += '&crs=epsg:'+unicode(epsg)
+        vl = QgsVectorLayer(uri,name,"memory")
+        # Need to do something about crs()
+        vl.startEditing()
+        fields=vl.pendingFields()
+        pr=vl.dataProvider()
+        for obs in landxml.observations():
+            fet = QgsFeature(fields)
+            fet.setGeometry(QgsGeometry.fromPolyline(
+                [QgsPoint(x,y) for x,y in obs.coords()]))
+            fet['from']=obs.mntfrom()
+            fet['to']=obs.mntto()
+            fet['distance']=obs.distance()
+            fet['disttype']=obs.disttype()
+            fet['distclass']=obs.distclass()
+            fet['distsurvey']=obs.distsurvey()
+            fet['azimuth']=obs.azimuth()
+            fet['azdegrees']=obs.azdegrees()
+            fet['arcradius']=obs.arcradius()
+            fet['arctype']=obs.arctype()
+            fet['aztype']=obs.aztype()
+            fet['azclass']=obs.azclass()
+            fet['azsurvey']=obs.azsurvey()
+            fet['equipment']=obs.equipment()
+            fet['date']=obs.date()
+            pr.addFeatures([fet])
+        vl.updateExtents()
+        vl.commitChanges()
+        QgsMapLayerRegistry.instance().addMapLayer(vl)

@@ -89,7 +89,7 @@
      <item>
       <widget class="QCheckBox" name="uImportObs">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>Observations</string>

@@ -11,6 +11,7 @@
 
 import re
 import xml.etree.ElementTree as et
+import math
 
 linz_epsg_mapping = {
     'COLLTM2000':2114,
@@ -67,6 +68,11 @@ linz_epsg_mapping = {
     'NZTM':2193
 }
 
+latlon_coordsys = {
+    'NZGD1949':1,
+    'NZGD2000':1,
+}
+
 class LandXmlException( Exception ):
 
     def __init_(self,value):
@@ -106,7 +112,8 @@ class Monument (object):
         beacon='',
         protection='',
         state='',
-        condition=''):
+        condition='',
+        purpose=''):
             self._point = point
             self._name = name
             self._lolid = lolid
@@ -116,6 +123,7 @@ class Monument (object):
             self._protection = protection
             self._state = state
             self._condition = condition
+            self._purpose = purpose
 
     def point(self):
         return self._point
@@ -143,6 +151,101 @@ class Monument (object):
 
     def protection(self):
         return self._protection
+
+    def purpose(self):
+        return self._purpose
+
+class Observation:
+
+    def __init__(self,
+        mntfrom='',
+        mntto='',
+        distance=None,
+        disttype='',
+        distclass='',
+        distsurvey='',
+        azimuth='',
+        azdegrees=None,
+        aztype='',
+        azclass='',
+        azsurvey='',
+        equipment='',
+        date='',
+        arctype=None,
+        arcradius=0,
+        geomtype=None,
+        coords=None
+                ):
+          self._mntfrom=mntfrom
+          self._mntto=mntto
+          self._equipment=equipment
+          self._distance=distance
+          self._disttype=disttype
+          self._distclass=distclass
+          self._distsurvey=distsurvey
+          self._azimuth=azimuth
+          self._azdegrees=azdegrees
+          self._aztype=aztype
+          self._azclass=azclass
+          self._azsurvey=azsurvey
+          self._date=date
+          self._arctype=arctype
+          self._arcradius=arcradius
+          self._geomtype=geomtype
+          self._coords=coords
+
+
+    def mntfrom(self):
+        return self._mntfrom
+
+    def mntto(self):
+        return self._mntto
+
+    def equipment(self):
+        return self._equipment
+
+    def distance(self):
+        return self._distance
+
+    def disttype(self):
+        return self._disttype
+
+    def distclass(self):
+        return self._distclass
+
+    def distsurvey(self):
+        return self._distsurvey
+
+    def azimuth(self):
+        return self._azimuth
+
+    def azdegrees(self):
+        return self._azdegrees
+
+    def aztype(self):
+        return self._aztype
+
+    def azclass(self):
+        return self._azclass
+
+    def azsurvey(self):
+        return self._azsurvey
+
+    def date(self):
+        return self._date
+
+    def arctype(self):
+        return self._arctype
+
+    def arcradius(self):
+        return self._arcradius
+
+    def geomtype(self):
+        return self._geomtype
+
+    def coords(self):
+        return self._coords
+
 
 class Parcel:
 
@@ -209,6 +312,9 @@ class LandXml (object):
         self._points=[]
         self._pointIdx={}
         self._surveys=[]
+        self._monumentNames = None
+        self._monumentPurposes = None
+        self._setups=None;
         self._parse()
         
     def _readHeader(self):
@@ -224,6 +330,7 @@ class LandXml (object):
         # self._readMarks()
         # self._readParcels()
         self._readSurveys()
+        # self._readObservations()
         
     def coordSys(self):
         return self._coordsys['name']
@@ -232,6 +339,9 @@ class LandXml (object):
         if self._coordsys['name'] in linz_epsg_mapping:
             return linz_epsg_mapping[self._coordsys['name']]
 
+    def coordSysIsLatLon(self):
+        return self._coordsys['name'] in latlon_coordsys
+
     def monuments(self):
         for m in self._readMarks():
             yield m
@@ -239,6 +349,10 @@ class LandXml (object):
     def parcels(self):
         for p in self._readParcels():
             yield p
+
+    def observations( self ):
+        for o in self._readObservations():
+            yield o
 
     def surveys(self):
         return self._surveys
@@ -256,8 +370,21 @@ class LandXml (object):
             self._points.append(point)
             self._pointIdx[id] = point
 
+    def _surveyMonumentPurpose( self, mntref ):
+        if self._monumentPurposes is None:
+            ns=self._ns
+            self._monumentPurposes={}
+            surveymonuments=self._data.findall("%sSurvey/%sSurveyMonument"%(ns,ns))
+            for sm in surveymonuments:
+                name=sm.get('mntRef','')
+                purpose=sm.get('purpose')
+                self._monumentPurposes[name]=purpose
+        return self._monumentPurposes.get(mntref,'')
+
     def _readMarks(self):
         ns = self._ns;
+        if self._monumentNames is None: 
+            self._monumentNames={}
         monuments=self._data.findall("%sMonuments/%sMonument"%(ns,ns))
         for m in monuments:
             oID = m.get('oID')
@@ -270,15 +397,34 @@ class LandXml (object):
             protection = m.get('beaconProtection','')
             pntref = m.get('pntRef')
             point = self._getPoint(pntref)
-            monument=Monument(point,name=name,lolid=lolid,description=desc,type=type,state=state,condition=condition,beacon=beacon,protection=protection)
+            purpose = self._surveyMonumentPurpose(name)
+            self._monumentNames[pntref]=name
+            monument=Monument(
+                point,
+                name=name,
+                lolid=lolid,
+                description=desc,
+                type=type,
+                state=state,
+                condition=condition,
+                beacon=beacon,
+                protection=protection,
+                purpose=purpose
+            )
             yield monument
+
+    def _monumentName(self,pntref):
+        if self._monumentNames is None:
+            for o in self.monuments():
+                pass
+        return self._monumentNames.get(pntref)
 
     def _readParcels(self):
         ns = self._ns;
         parcels=self._data.findall("%sParcels/%sParcel"%(ns,ns))
         for p in parcels:
             cogo = p.find(ns+"CoordGeom");
-            if not cogo:
+            if cogo is None:
                 continue
             oID = p.get('oID')
             name,lolid = self._parseLolId(p.get('name'))
@@ -299,6 +445,180 @@ class LandXml (object):
                 raise LandXmlException("Parcel "+name+": "+unicode(excp))
             yield parcel
             #self._parcels.append(parcel)
+
+    def _setupPointRef(self,stpid):
+        if self._setups is None:
+            ns=self._ns
+            self._setups={}
+            setups=self._data.findall("%sSurvey/%sInstrumentSetup"%(ns,ns))
+            for stp in setups:
+                id=stp.get('id')
+                pt=stp.find("%sInstrumentPoint"%(ns))
+                if pt is not None:
+                    pntref=pt.get('pntRef')
+                    if id is not None and pntref is not None:
+                        self._setups[id]=pntref
+        return self._setups.get(stpid)
+
+    def _readObservations(self):
+        ns = self._ns;
+        obs=self._data.findall("%sSurvey/%sReducedObservation"%(ns,ns))
+        for o in obs:
+            yield self._readObservation(o)
+
+        arcobs=self._data.findall("%sSurvey/%sReducedArcObservation"%(ns,ns))
+        for o in arcobs:
+            yield self._readObservation(o)
+
+    def _readObservation(self, obsel ):
+
+        try:
+            ptreffrom=self._setupPointRef(obsel.get('setupID'))
+            ptfrom=self._getPoint(ptreffrom)
+            mntfrom=self._monumentName(ptreffrom) or 'unnamed'
+
+            ptrefto=None
+            elto=obsel.find("%sTargetPoint"%(self._ns))
+            if elto is not None:
+                ptrefto=elto.get('pntRef')
+            mntto=self._monumentName(ptrefto) or 'unnamed'
+            ptto=self._getPoint(ptrefto)
+
+            radius=0.0
+            arctype=obsel.get('rot')
+            if arctype:
+                distance=obsel.get('length')
+                azimuth=obsel.get('chordAzimuth')
+                radius=float(obsel.get('radius'))
+                disttype=obsel.get('arcType')
+                aztype=disttype
+                distclass=obsel.get('lengthAccClass')
+                azclass=obsel.get('azimuthAccClass')
+                distsurvey=obsel.get('adoptedSurvey')
+                azsurvey=distsurvey
+            else:
+                distance=obsel.get('horizDistance')
+                azimuth=obsel.get('azimuth')
+                disttype=obsel.get('distanceType')
+                aztype=obsel.get('azimuthType')
+                distclass=obsel.get('distanceAccClass')
+                azclass=obsel.get('azimuthAccClass')
+                distsurvey=obsel.get('adoptedDistanceSurvey')
+                azsurvey=obsel.get('adoptedAzimuthSurvey')
+
+            equipment=obsel.get('equipmentUsed')
+            date=obsel.get('date')
+
+            azdegrees=None;
+            if azimuth:
+                match=re.match(azimuth,r'(\d+)\.(\d\d)(\d\d)$')
+                if match:
+                    azdegrees=float(match.group(1))+float(match.group(2))/60.0+float(match.group(3))/3600.0;
+                    azimuth=match.group(1)+u"\xB0"+match.group('2')+"'"+match.group(3)+'"'
+            if distance is not None:
+                distance=float(distance)
+
+            coofrom=ptfrom.coords()
+            cooto=ptto.coords()
+            coords=[coofrom,cooto]
+
+            if arctype is not None:
+                coords=self._arcCoords(coords,arctype,length=distance,radius=radius)
+
+            geomtype='line'
+
+            return Observation(
+                mntfrom=mntfrom,
+                mntto=mntto,
+                distance=distance,
+                disttype=disttype,
+                distclass=distclass,
+                distsurvey=distsurvey,
+                azimuth=azimuth,
+                azdegrees=azdegrees,
+                aztype=aztype,
+                azclass=azclass,
+                azsurvey=azsurvey,
+                equipment=equipment,
+                date=date,
+                arctype=arctype,
+                arcradius=radius,
+                geomtype=geomtype,
+                coords=coords
+                )
+        except LandXmlException as exc:
+            tag=self._getTag(obsel)
+            for k in obsel.keys():
+                v=obsel.get(k,'')
+                tag=tag+' '+k+':'+v
+            raise LandXmlException( unicode(exc)+' in '+tag)
+
+
+    def _arcCoords( self, coords, arctype, length=0.0, radius=0.0, centre=None ):
+        # For now just return input chords... consider creating an arc!
+        cw = (arctype == 'cw')
+        xmult=1.0
+        ymult=1.0
+        latlon=self.coordSysIsLatLon()
+        if latlon:
+            ymult=100000.0
+            xmult=ymult*math.cos(math.radians((coords[0][1]+coords[1][1])/2.0))
+
+        wx0=coords[0][0]
+        wy0=coords[0][1]
+        dwx=(coords[1][0]-wx0)*xmult
+        dwy=(coords[1][1]-wy0)*ymult
+
+        twopi=math.pi*2
+        if centre is not None:
+            rx1=(wx0-centre[0])*xmult
+            ry1=(wy0-centre[1])*ymult
+            rx2=(coords[1][0]-centre[0])*xmult
+            ry2=(coords[1][1]-centre[1])*ymult
+            radius=(math.hypot(rx1,ry1)+math.hypot(rx2,ry2))/2.0
+            angdif=math.atan2(ry2,rx2)-math.atan2(ry1,rx1)
+            if cw:
+                angdif=-angdif
+            if angdif > twopi: 
+                angdif -= twopi
+            if angdif < 0:
+                angdif += twopi
+            length=angdif*radius
+
+        precision=0.1
+        if radius < precision:
+            return coords
+
+        angle=length/radius
+        # If less than a few degrees or nearly a full circle don't use...
+        if angle < 0.05 or angle > twopi - 0.05:
+            return coords
+        if length < 0.1:
+            return coords
+
+        anginc=math.acos(1-precision/radius)
+        if anginc > 0.5:
+            anginc=0.5
+        if anginc < 0.02:
+            anginc=0.02
+
+        nseg=int(angle/anginc)
+        if arctype != 'cw': 
+            angle=-angle
+
+        a0=-(math.pi+angle)/2.0
+        ainc=angle/nseg
+        x0=math.cos(a0)
+        y0=math.sin(a0)
+        dwx /= (-2.0*x0)
+        dwy /= (-2.0*x0)
+
+        coords=[]
+        for i in range(nseg+1):
+            x=math.cos(a0+ainc*i)-x0
+            y=math.sin(a0+ainc*i)-y0
+            coords.append([ wx0+(dwx*x+dwy*y)/xmult, wy0+(dwy*x-dwx*y)/ymult ])
+        return coords
 
     def _readSurveys(self):
         pass
@@ -423,8 +743,14 @@ class LandXml (object):
         return crds
 
     def _readCurve(self,c):
-        ''' Haven't handled Curve elements - just return start and endpoints '''
-        return self._readLine(c)
+        crds=self._readLine(c)
+        try:
+            cntel=c.find("%sCenter"%(self._ns))
+            centre=self._getCoords(cntel.text)
+            arctype=c.get('rot')
+            return self._arcCoords(crds,arctype,centre=centre)
+        except:
+            return crds
 
     def _calcArea(self,c):
         if len(c) < 3:

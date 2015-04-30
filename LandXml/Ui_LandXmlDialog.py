@@ -1,67 +1,81 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Documents and Settings\ccrook\.qgis\python\plugins\LandXml\Ui_LandXmlDialog.ui'
+# Form implementation generated from reading ui file 'Ui_LandXmlDialog.ui'
 #
-# Created: Wed Mar 10 09:56:15 2010
-#      by: PyQt4 UI code generator 4.5.2
+# Created: Thu Apr 30 13:09:50 2015
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
 
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
+
 class Ui_LandXmlDialog(object):
     def setupUi(self, LandXmlDialog):
-        LandXmlDialog.setObjectName("LandXmlDialog")
+        LandXmlDialog.setObjectName(_fromUtf8("LandXmlDialog"))
         LandXmlDialog.setWindowModality(QtCore.Qt.NonModal)
         LandXmlDialog.resize(476, 130)
         LandXmlDialog.setSizeGripEnabled(True)
         self.verticalLayout = QtGui.QVBoxLayout(LandXmlDialog)
-        self.verticalLayout.setObjectName("verticalLayout")
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.horizontalLayout = QtGui.QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
         self.uXmlFileLabel = QtGui.QLabel(LandXmlDialog)
         self.uXmlFileLabel.setEnabled(True)
-        self.uXmlFileLabel.setObjectName("uXmlFileLabel")
+        self.uXmlFileLabel.setObjectName(_fromUtf8("uXmlFileLabel"))
         self.horizontalLayout.addWidget(self.uXmlFileLabel)
         self.uXmlFile = QtGui.QLineEdit(LandXmlDialog)
         self.uXmlFile.setEnabled(False)
         self.uXmlFile.setReadOnly(True)
-        self.uXmlFile.setObjectName("uXmlFile")
+        self.uXmlFile.setObjectName(_fromUtf8("uXmlFile"))
         self.horizontalLayout.addWidget(self.uXmlFile)
         self.uBrowseXmlFile = QtGui.QPushButton(LandXmlDialog)
-        self.uBrowseXmlFile.setObjectName("uBrowseXmlFile")
+        self.uBrowseXmlFile.setObjectName(_fromUtf8("uBrowseXmlFile"))
         self.horizontalLayout.addWidget(self.uBrowseXmlFile)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
         self.label = QtGui.QLabel(LandXmlDialog)
-        self.label.setObjectName("label")
+        self.label.setObjectName(_fromUtf8("label"))
         self.horizontalLayout_2.addWidget(self.label)
         self.uImportMarks = QtGui.QCheckBox(LandXmlDialog)
         self.uImportMarks.setChecked(True)
-        self.uImportMarks.setObjectName("uImportMarks")
+        self.uImportMarks.setObjectName(_fromUtf8("uImportMarks"))
         self.horizontalLayout_2.addWidget(self.uImportMarks)
         self.uImportParcels = QtGui.QCheckBox(LandXmlDialog)
         self.uImportParcels.setChecked(True)
-        self.uImportParcels.setObjectName("uImportParcels")
+        self.uImportParcels.setObjectName(_fromUtf8("uImportParcels"))
         self.horizontalLayout_2.addWidget(self.uImportParcels)
         self.uImportObs = QtGui.QCheckBox(LandXmlDialog)
-        self.uImportObs.setEnabled(False)
+        self.uImportObs.setEnabled(True)
         self.uImportObs.setChecked(False)
-        self.uImportObs.setObjectName("uImportObs")
+        self.uImportObs.setObjectName(_fromUtf8("uImportObs"))
         self.horizontalLayout_2.addWidget(self.uImportObs)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.uButtonBox = QtGui.QDialogButtonBox(LandXmlDialog)
         self.uButtonBox.setOrientation(QtCore.Qt.Horizontal)
         self.uButtonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-        self.uButtonBox.setObjectName("uButtonBox")
+        self.uButtonBox.setObjectName(_fromUtf8("uButtonBox"))
         self.verticalLayout.addWidget(self.uButtonBox)
         self.uXmlFileLabel.setBuddy(self.uXmlFile)
         self.label.setBuddy(self.uImportMarks)
 
         self.retranslateUi(LandXmlDialog)
-        QtCore.QObject.connect(self.uButtonBox, QtCore.SIGNAL("accepted()"), LandXmlDialog.accept)
-        QtCore.QObject.connect(self.uButtonBox, QtCore.SIGNAL("rejected()"), LandXmlDialog.close)
+        QtCore.QObject.connect(self.uButtonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), LandXmlDialog.accept)
+        QtCore.QObject.connect(self.uButtonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), LandXmlDialog.close)
         QtCore.QMetaObject.connectSlotsByName(LandXmlDialog)
         LandXmlDialog.setTabOrder(self.uXmlFile, self.uBrowseXmlFile)
         LandXmlDialog.setTabOrder(self.uBrowseXmlFile, self.uImportMarks)
@@ -70,11 +84,11 @@ class Ui_LandXmlDialog(object):
         LandXmlDialog.setTabOrder(self.uImportObs, self.uButtonBox)
 
     def retranslateUi(self, LandXmlDialog):
-        LandXmlDialog.setWindowTitle(QtGui.QApplication.translate("LandXmlDialog", "Import LandXml data", None, QtGui.QApplication.UnicodeUTF8))
-        self.uXmlFileLabel.setText(QtGui.QApplication.translate("LandXmlDialog", "LandXml file", None, QtGui.QApplication.UnicodeUTF8))
-        self.uBrowseXmlFile.setText(QtGui.QApplication.translate("LandXmlDialog", "Browse", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("LandXmlDialog", "Features to import:", None, QtGui.QApplication.UnicodeUTF8))
-        self.uImportMarks.setText(QtGui.QApplication.translate("LandXmlDialog", "Marks", None, QtGui.QApplication.UnicodeUTF8))
-        self.uImportParcels.setText(QtGui.QApplication.translate("LandXmlDialog", "Parcels", None, QtGui.QApplication.UnicodeUTF8))
-        self.uImportObs.setText(QtGui.QApplication.translate("LandXmlDialog", "Observations", None, QtGui.QApplication.UnicodeUTF8))
+        LandXmlDialog.setWindowTitle(_translate("LandXmlDialog", "Import LandXml data", None))
+        self.uXmlFileLabel.setText(_translate("LandXmlDialog", "LandXml file", None))
+        self.uBrowseXmlFile.setText(_translate("LandXmlDialog", "Browse", None))
+        self.label.setText(_translate("LandXmlDialog", "Features to import:", None))
+        self.uImportMarks.setText(_translate("LandXmlDialog", "Marks", None))
+        self.uImportParcels.setText(_translate("LandXmlDialog", "Parcels", None))
+        self.uImportObs.setText(_translate("LandXmlDialog", "Observations", None))
 
