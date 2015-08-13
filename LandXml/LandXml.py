@@ -767,3 +767,52 @@ class LandXml (object):
             dx0 = dx1
             dy0 = dy1
         return area
+
+if __name__=="__main__":
+    import sys
+    landxml=LandXml(sys.argv[1])
+    for parcel in landxml.parcels():
+        print ("Parcel",
+             parcel.geomtype(),
+             parcel.lolid(),
+             parcel.name(),
+             parcel.description(),
+             parcel.type(),
+             parcel.pclass(),
+             parcel.state(),
+             parcel.area(),
+        ),
+
+    for obs in landxml.observations():
+        print ("Observation",
+            obs.mntfrom(),
+            obs.mntto(),
+            obs.distance(),
+            obs.disttype(),
+            obs.distclass(),
+            obs.distsurvey(),
+            obs.azimuth(),
+            obs.azdegrees(),
+            obs.arcradius(),
+            obs.arctype(),
+            obs.aztype(),
+            obs.azclass(),
+            obs.azsurvey(),
+            obs.equipment(),
+            obs.date(),
+        ),
+
+    for mark in landxml.monuments():
+        print ("Monument",
+            mark.point().coords(),
+            mark.lolid(),
+            mark.name(),
+            mark.description(),
+            mark.type(),
+            mark.beacon(),
+            mark.protection(),
+            mark.state(),
+            mark.condition(),
+            mark.point().order(),
+            mark.purpose(),
+        ),
