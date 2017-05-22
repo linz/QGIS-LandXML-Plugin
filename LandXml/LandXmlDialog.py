@@ -79,6 +79,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
         name = "LandXml_marks"
         uri="Point?"+"&".join(['field='+x for x in (
             'mrk_id:int',
+            'pnt_id:string',
             'name:string',
             'description:string',
             'type:string',
@@ -101,6 +102,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             fet = QgsFeature(fields)
             fet.setGeometry(QgsGeometry.fromPoint(QgsPoint(x,y)))
             fet['mrk_id']=mark.lolid()
+            fet['pnt_id']=mark.point().id()
             fet['name']=mark.name()
             fet['description']=mark.description()
             fet['type']=mark.type()

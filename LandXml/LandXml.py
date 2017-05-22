@@ -83,14 +83,18 @@ class LandXmlException( Exception ):
 
 class Point (object):
 
-    def __init__(self,coords,id='',order='',type=''):
+    def __init__(self,coords, oid='',id='',order='',type=''):
         self._coords = coords
+        self._oid = oid
         self._id = id
         self._order = order
         self._type = type
 
     def coords(self):
         return self._coords
+
+    def oid( self ):
+        return self._oid
 
     def id(self):
         return self._id
@@ -105,6 +109,7 @@ class Point (object):
 class Monument (object):
 
     def __init__(self,point,
+        oid='',
         name='',
         lolid='',
         description='',
@@ -115,6 +120,7 @@ class Monument (object):
         condition='',
         purpose=''):
             self._point = point
+            self._oid = oid,
             self._name = name
             self._lolid = lolid
             self._description = description
@@ -127,6 +133,9 @@ class Monument (object):
 
     def point(self):
         return self._point
+
+    def oid(self):
+        return self._oid
 
     def name(self):
         return self._name
@@ -252,7 +261,8 @@ class Parcel:
     def __init__(self,
             coords,
             geomtype,
-            name,
+            oid='',
+            name='',
             lolid='',
             description='',
             area=0.0,
@@ -261,6 +271,7 @@ class Parcel:
             type=''):
         self._coords=coords
         self._geomtype=geomtype
+        self._oid=oid
         self._name=name
         self._lolid=lolid
         self._description = description
@@ -274,6 +285,9 @@ class Parcel:
 
     def geomtype( self):
         return self._geomtype
+
+    def oid( self ):
+        return self._oid
 
     def name(self):
         return self._name
@@ -366,7 +380,7 @@ class LandXml (object):
             id = p.get('name','')
             pntType = p.get('pntSurv','')
             coords = self._getCoords(p.text)
-            point = Point(coords,id=id,order=order,type=pntType)
+            point = Point(coords,oid=oID,id=id,order=order,type=pntType)
             self._points.append(point)
             self._pointIdx[id] = point
 
@@ -401,6 +415,7 @@ class LandXml (object):
             self._monumentNames[pntref]=name
             monument=Monument(
                 point,
+                oid=oID,
                 name=name,
                 lolid=lolid,
                 description=desc,
@@ -439,7 +454,7 @@ class LandXml (object):
             type = p.get('parcelType','')
             try:
                 coords, geomtype = self._readCoGo(cogo)
-                parcel = Parcel(coords,geomtype,name,lolid=lolid,description=desc,area=area,
+                parcel = Parcel(coords,geomtype,oid=oID,name=name,lolid=lolid,description=desc,area=area,
                     state=state,pclass=pclass,type=type)
             except LandXmlException as excp:
                 raise LandXmlException("Parcel "+name+": "+unicode(excp))
@@ -555,7 +570,6 @@ class LandXml (object):
 
 
     def _arcCoords( self, coords, arctype, length=0.0, radius=0.0, centre=None ):
-        # For now just return input chords... consider creating an arc!
         cw = (arctype == 'cw')
         xmult=1.0
         ymult=1.0
