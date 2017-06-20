@@ -605,8 +605,8 @@ class LandXml (object):
 
         angle=length/radius
         # If less than a few degrees or nearly a full circle don't use...
-        if angle < 0.05 or angle > twopi - 0.05:
-            return coords
+        #if angle < 0.05 or angle > twopi - 0.05:
+        #    return coords
         if length < 0.1:
             return coords
 
@@ -617,6 +617,9 @@ class LandXml (object):
             anginc=0.02
 
         nseg=int(angle/anginc)
+        if nseg < 1:
+            return coords
+
         if arctype != 'cw': 
             angle=-angle
 
