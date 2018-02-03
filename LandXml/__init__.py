@@ -12,7 +12,7 @@
 #
 ################################################################################
 
-from LandXmlPlugin import LandXmlPlugin
+from .LandXmlPlugin import LandXmlPlugin
 
 
 def name():

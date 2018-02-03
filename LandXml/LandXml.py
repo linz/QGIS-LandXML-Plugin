@@ -317,7 +317,7 @@ class LandXml (object):
         data.parse(file)
         root = data.find(".")
         ns = root.tag.split("}")[0]+"}"
-        self._file = unicode(file)
+        self._file = str(file)
         self._data = data
         self._root = root
         self._ns = ns
@@ -457,7 +457,7 @@ class LandXml (object):
                 parcel = Parcel(coords,geomtype,oid=oID,name=name,lolid=lolid,description=desc,area=area,
                     state=state,pclass=pclass,type=type)
             except LandXmlException as excp:
-                raise LandXmlException("Parcel "+name+": "+unicode(excp))
+                raise LandXmlException("Parcel "+name+": "+str(excp))
             yield parcel
             #self._parcels.append(parcel)
 
@@ -529,7 +529,7 @@ class LandXml (object):
                 m=re.match(r'(\d+)\.(\d\d)(\d\d)$',azimuth)
                 if m:
                     azdegrees=float(m.group(1))+float(m.group(2))/60.0+float(m.group(3))/3600.0;
-                    azimuth=m.group(1)+u"\xB0"+m.group(2)+"'"+m.group(3)+'"'
+                    azimuth=m.group(1)+"\xB0"+m.group(2)+"'"+m.group(3)+'"'
             if distance is not None:
                 distance=float(distance)
 
@@ -563,10 +563,10 @@ class LandXml (object):
                 )
         except LandXmlException as exc:
             tag=self._getTag(obsel)
-            for k in obsel.keys():
+            for k in list(obsel.keys()):
                 v=obsel.get(k,'')
                 tag=tag+' '+k+':'+v
-            raise LandXmlException( unicode(exc)+' in '+tag)
+            raise LandXmlException( str(exc)+' in '+tag)
 
 
     def _arcCoords( self, coords, arctype, length=0.0, radius=0.0, centre=None ):
@@ -723,7 +723,7 @@ class LandXml (object):
         try:
             return self._pointIdx[id]
         except:
-            raise LandXmlException("CgPoint with name "+unicode(id)+" is not defined in "+self._file)
+            raise LandXmlException("CgPoint with name "+str(id)+" is not defined in "+self._file)
 
     def _readPointType(self,c,tag):
         ns = self._ns
@@ -789,7 +789,7 @@ if __name__=="__main__":
     import sys
     landxml=LandXml(sys.argv[1])
     for parcel in landxml.parcels():
-        print ("Parcel",
+        print(("Parcel",
              parcel.geomtype(),
              parcel.lolid(),
              parcel.name(),
@@ -798,10 +798,10 @@ if __name__=="__main__":
              parcel.pclass(),
              parcel.state(),
              parcel.area(),
-        ),
+        ), end=' ')
 
     for obs in landxml.observations():
-        print ("Observation",
+        print(("Observation",
             obs.mntfrom(),
             obs.mntto(),
             obs.distance(),
@@ -817,10 +817,10 @@ if __name__=="__main__":
             obs.azsurvey(),
             obs.equipment(),
             obs.date(),
-        ),
+        ), end=' ')
 
     for mark in landxml.monuments():
-        print ("Monument",
+        print(("Monument",
             mark.point().coords(),
             mark.lolid(),
             mark.name(),
@@ -832,4 +832,4 @@ if __name__=="__main__":
             mark.condition(),
             mark.point().order(),
             mark.purpose(),
-        ),
+        ), end=' ')

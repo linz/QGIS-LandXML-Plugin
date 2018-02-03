@@ -12,8 +12,9 @@
 ################################################################################
 
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from qgis.core import *
 
 import sys
@@ -22,8 +23,8 @@ import string
 import math
 from shapely.geometry import MultiPolygon,MultiLineString
 
-from LandXml import LandXml
-from Ui_LandXmlDialog import Ui_LandXmlDialog
+from .LandXml import LandXml
+from .Ui_LandXmlDialog import Ui_LandXmlDialog
 
 
 class LandXmlDialog(QDialog, Ui_LandXmlDialog):
@@ -40,18 +41,18 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
         # Set up the user interface from Designer.
         self.setupUi(self)
         #Signals
-        QObject.connect(self.uBrowseXmlFile, SIGNAL("clicked()"), self._browseXmlFile)
-        QObject.connect(self.uButtonBox, SIGNAL("accepted()"), self._accept)
+        self.uBrowseXmlFile.clicked.connect(self._browseXmlFile)
+        self.uButtonBox.accepted.connect(self._accept)
 
     def _browseXmlFile(self):
         filename = QFileDialog.getOpenFileName(self,"Select LandXml file",
-            self._home, "LandXml files (*.xml);;All files (*.*)")
+            self._home, "LandXml files (*.xml);;All files (*.*)")[0]
         if filename:
             self.uXmlFile.setText(filename)
 
 
     def _accept(self):
-        filename = unicode(self.uXmlFile.text())
+        filename = str(self.uXmlFile.text())
         homedir = os.path.dirname(filename)
         settings = QSettings()
         settings.setValue(LandXmlDialog.browsePathSetting,homedir)
@@ -72,7 +73,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
                 self._createObsLayer(data)
         except:
             # raise
-            message = unicode(sys.exc_info()[1])
+            message = str(sys.exc_info()[1])
             QMessageBox.information(self,"LandXml error","Problem importing xml\n"+message)
     
     def _createMarkLayer(self,landxml):
@@ -91,16 +92,16 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             'purpose:string')])
         epsg = landxml.coordSysEpsgId()
         if epsg:
-            uri += '&crs=epsg:'+unicode(epsg)
+            uri += '&crs=epsg:'+str(epsg)
         vl = QgsVectorLayer(uri,name,"memory")
         # Need to do something about crs()
         vl.startEditing()
-        fields=vl.pendingFields()
+        fields=vl.fields()
         pr=vl.dataProvider()
         for mark in landxml.monuments():
             (x,y) = mark.point().coords()
             fet = QgsFeature(fields)
-            fet.setGeometry(QgsGeometry.fromPoint(QgsPoint(x,y)))
+            fet.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x,y)))
             fet['mrk_id']=mark.lolid()
             fet['pnt_id']=mark.point().id()
             fet['name']=mark.name()
@@ -115,7 +116,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             pr.addFeatures([fet])
         vl.updateExtents()
         vl.commitChanges()
-        QgsMapLayerRegistry.instance().addMapLayer(vl)
+        QgsProject.instance().addMapLayer(vl)
 
     def _createParcelLayer(self, landxml):
         parcel_layers={
@@ -134,18 +135,18 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             )])
         epsg = landxml.coordSysEpsgId()
         if epsg:
-            uri += '&crs=epsg:'+unicode(epsg)
+            uri += '&crs=epsg:'+str(epsg)
 
         for parcel in landxml.parcels():
             try:
                 gtype=parcel.geomtype()
                 if not gtype in parcel_layers:
-                    raise RuntimeError("Cannot handle parcel geometry type "+unicode(gtype))
+                    raise RuntimeError("Cannot handle parcel geometry type "+str(gtype))
                 glayer=parcel_layers[gtype]
                 if glayer['layer'] is None:
                     glayer['layer']=QgsVectorLayer(gtype+"?"+uri,glayer['name'],'memory')
                 vl=glayer['layer']
-                fields=vl.pendingFields()
+                fields=vl.fields()
                 pr=vl.dataProvider()
                 fet = QgsFeature(fields)
                 geomwkt=glayer['geomfunc'](parcel.coords()).to_wkt()
@@ -159,14 +160,14 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
                 fet['area']=parcel.area() 
                 pr.addFeatures([fet])
             except Exception as e:
-                raise RuntimeError("Parcel "+parcel.name()+": "+unicode(e))
+                raise RuntimeError("Parcel "+parcel.name()+": "+str(e))
 
-        for glayer in parcel_layers.values():
+        for glayer in list(parcel_layers.values()):
             vl=glayer['layer']
             if vl is not None:
                 vl.updateExtents()
                 vl.commitChanges()
-                QgsMapLayerRegistry.instance().addMapLayer(vl)
+                QgsProject.instance().addMapLayer(vl)
     
     def _createObsLayer(self,landxml):
         name = "LandXml_observations"
@@ -189,11 +190,11 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             )])
         epsg = landxml.coordSysEpsgId()
         if epsg:
-            uri += '&crs=epsg:'+unicode(epsg)
+            uri += '&crs=epsg:'+str(epsg)
         vl = QgsVectorLayer(uri,name,"memory")
         # Need to do something about crs()
         vl.startEditing()
-        fields=vl.pendingFields()
+        fields=vl.fields()
         pr=vl.dataProvider()
         for obs in landxml.observations():
             fet = QgsFeature(fields)
@@ -217,4 +218,4 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
             pr.addFeatures([fet])
         vl.updateExtents()
         vl.commitChanges()
-        QgsMapLayerRegistry.instance().addMapLayer(vl)
+        QgsProject.instance().addMapLayer(vl)

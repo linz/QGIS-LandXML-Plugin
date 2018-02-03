@@ -11,11 +11,12 @@
 #
 ################################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from qgis.core import *
 
-from LandXmlDialog import LandXmlDialog
+from .LandXmlDialog import LandXmlDialog
 
 class LandXmlPlugin:
 
@@ -26,7 +27,7 @@ class LandXmlPlugin:
         self._action = QAction(QIcon(":/plugins/LandXml/LandXmlIcon.png"), 
         "LandXml", self._iface.mainWindow())
         self._action.setWhatsThis("Import a LandXml file")
-        QObject.connect(self._action, SIGNAL("activated()"), self.run)
+        self._action.triggered.connect(self.run)
         # self.iface.addToolBarIcon(self.action)
         self._iface.addPluginToMenu("&LandXml", self._action)
 
