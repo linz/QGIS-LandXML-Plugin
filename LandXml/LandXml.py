@@ -642,11 +642,13 @@ class LandXml (object):
 
     def _parseLolId(self,name):
         lolid = 0
-        match = re.search(r'\s+\[(\d+)\]\s*$',name)
+        match = re.search(r'(?:^|\s+)\[(\d+)\]\s*$',name)
         if match:
             lolid = int(match.group(1))
-            name = name[:match.start()]
-        return name,lolid
+            mrkname = name[:match.start()].strip()
+            if mrkname == '':
+                mrkname=name
+        return mrkname,lolid
 
     def _getTag(self,element):
         return element.tag.replace(self._ns,'')

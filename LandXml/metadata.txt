@@ -10,7 +10,7 @@ about=The LandXml format is an Xml format used to transfer cadastral survey data
   Land Information New Zealand Landonline application - it may not support
   LandXml from other sources.
 category=Vector
-version=2.0
+version=2.1
 experimental=False
 qgisMinimumVersion=3.0
 repository=https://github.com/linz/QGIS-LandXML-Plugin
