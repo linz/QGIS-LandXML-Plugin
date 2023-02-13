@@ -22,6 +22,7 @@ import os.path
 import string
 import math
 from shapely.geometry import MultiPolygon,MultiLineString
+import shapely.wkt
 
 from .LandXml import LandXml
 from .Ui_LandXmlDialog import Ui_LandXmlDialog
@@ -149,7 +150,7 @@ class LandXmlDialog(QDialog, Ui_LandXmlDialog):
                 fields=vl.fields()
                 pr=vl.dataProvider()
                 fet = QgsFeature(fields)
-                geomwkt=glayer['geomfunc'](parcel.coords()).to_wkt()
+                geomwkt=shapely.wkt.dumps(glayer['geomfunc'](parcel.coords()))
                 fet.setGeometry(QgsGeometry.fromWkt(geomwkt))
                 fet['lolid']=parcel.lolid()
                 fet['name']=parcel.name() 

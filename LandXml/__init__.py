@@ -19,13 +19,13 @@ def name():
     return "LandXml import plugin"
 
 def description():
-    return "Import parcels and nodes from a LINZ LandXml file"
+    return "Import parcels and nodes from a LandXml file"
 
 def version():
-    return "1.2"
+    return "2.3"
 
 def qgisMinimumVersion():
-    return "2.0"
+    return "3.0"
 
 def authorName():
     return "Chris Crook"

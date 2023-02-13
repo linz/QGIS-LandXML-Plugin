@@ -666,7 +666,7 @@ class LandXml (object):
         '''
         crdlist = []
         coords = None
-        for c in cogo.getchildren():
+        for c in cogo:
             tag = self._getTag(c)
             line = None
             if tag == "Line":
